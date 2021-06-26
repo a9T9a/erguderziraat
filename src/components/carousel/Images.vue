@@ -34,7 +34,6 @@ export default {
   },
 
   created(){
-    
     if(this.getImages.length>0){
       this.getImages.forEach(image => {
         this.images.push(image.imageURL)
@@ -42,7 +41,6 @@ export default {
 
       this.ready=true
       this.slide()
-      this.arrows()
     }else{
       eventBus.$on("imagesReady", async ()=>{
         await this.getImages.forEach(image => {
@@ -51,11 +49,11 @@ export default {
   
         this.ready=true
         this.slide()
-        this.arrows()
       })
     }
-
-
+  },
+  mounted(){
+    this.arrows()
   },
 
   computed:{
@@ -114,7 +112,7 @@ export default {
 
     arrows(){
       let els=document.getElementsByClassName("nav-button")
-      setTimeout(() => {
+
         els[0].style.opacity=0
         els[0].style.display="flex"
         els[1].style.opacity=0
@@ -143,9 +141,7 @@ export default {
             clearInterval(els1)
           }
         }, 20);
-
-      }, 2000);
-    }
+    },
   }
 }
 
@@ -167,6 +163,7 @@ export default {
   /*box-shadow:  0 0.5vmax 1vmax -0.1vmax rgb(120, 120, 120);*/
   box-shadow:  0 0.5vmax 1vmax -0.1vmax black;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .nav-button {

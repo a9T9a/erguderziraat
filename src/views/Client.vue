@@ -30,7 +30,7 @@ export default {
 <style scoped>
 
 .show-enter-active {
-  transition: opacity 1s ease;
+  transition: opacity .5s ease;
 }
 
 .show-leave-active {

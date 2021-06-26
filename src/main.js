@@ -14,3 +14,9 @@ new Vue({
   store,
   render: h => h(App)
 })
+
+
+router.beforeEach((to,from,next)=>{
+  window.scroll(0,0)
+  next()
+})

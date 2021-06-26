@@ -1,6 +1,8 @@
 <template>
     <div id="footer" class="footer">
+
         <div class="links">
+
             <div class="part">
                 <div>
                     <p class="header">Hızlı Erişim</p>
@@ -21,18 +23,34 @@
                         <p>Ürünler</p>
                     </router-link>
 
-                    <div class="item">
+                    <router-link 
+                     tag="div"
+                     to="/about"
+                     class="item">
                         <p>Hakkımızda</p>
-                    </div>
-                    <div class="item">
+                    </router-link>
+
+                    <router-link 
+                     tag="div"
+                     to="/dealership"
+                     class="item">
                         <p>Bayilikler</p>
-                    </div>
-                    <div class="item">
+                    </router-link>
+
+                    <router-link 
+                     tag="div"
+                     to="/about"
+                     class="item">
                         <p>Belgeler</p>
-                    </div>
-                    <div class="item">
+                    </router-link>
+
+                    <router-link 
+                     tag="div"
+                     to="/contact"
+                     class="item">
                         <p>İletişim</p>
-                    </div>
+                    </router-link>
+
                 </div>
             </div>
 
@@ -43,15 +61,15 @@
                 </div>
 
                 <div class="container">
-                    <div class="item">
+                    <div class="item" @click="link('facebook')">
                         <img class="sm" src="../../assets/facebook.png">
                         <p>Ergüder Ziraat Market</p>
                     </div>
-                    <div class="item">
+                    <div class="item" @click="link('instagram')">
                         <img class="sm" src="../../assets/instagram.png">
                         <p>erguderziraatmarket</p>
                     </div>
-                    <div class="item">
+                    <div class="item" @click="link('twitter')">
                         <img class="sm" src="../../assets/twitter.png">
                         <p>Twitter</p>
                     </div>
@@ -92,6 +110,26 @@ export default {
 
         window.addEventListener("")
     }*/
+
+    methods:{
+        link(url) {
+            switch (url) {
+                case (url = "facebook"):
+                window.open(
+                    "https://www.facebook.com/groups/erguderziraatmarket",
+                    "_blank"
+                );
+                break;
+
+                case (url = "instagram"):
+                window.open(
+                    "https://www.instagram.com/erguderziraatmarket",
+                    "_blank"
+                );
+                break;
+            }
+        },
+    }
 }
 </script>
 
@@ -107,7 +145,6 @@ export default {
     justify-content: space-around;
     align-items:flex-start;
     padding-inline: 1vmax;
-    padding-top: 2.5vmax;
     
 }
 
@@ -115,7 +152,8 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-
+    overflow: hidden;
+    flex-wrap: wrap;
     width: 100%;
 }
 

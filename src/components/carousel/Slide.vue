@@ -24,13 +24,7 @@ export default {
         dir(){
             return this.$parent.slideDirection
         }
-
     },
-
-    mounted() {
-        //console.log(this.image)
-    },
-
 }   
 </script>
 

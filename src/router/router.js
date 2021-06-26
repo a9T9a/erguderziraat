@@ -7,9 +7,15 @@ import AddImage from "../components/admin/AddImage"
 import ProductList from "../components/ProductList"
 import Client from "../views/Client"
 import Dealership from "../views/Dealership"
+import Annos from "../views/Annos"
 import About from "../views/About"
+import Contact from "../views/Contact"
+import AdminHome from "../components/admin/AdminHome"
+import AddDealer from "../components/admin/AddDealer"
+import AddAnnouncement from "../components/admin/AddAnnouncement"
 
 Vue.use(VueRouter)
+
 
 const routes = [
     {
@@ -21,7 +27,7 @@ const routes = [
             {
                 path:"/",
                 name:"Home",
-                component:Home
+                component:Home,
             },
 
             {
@@ -41,6 +47,18 @@ const routes = [
                 name:"Dealership",
                 component:Dealership
             },
+
+            {
+                path:"/announcements",
+                name:"Announcements",
+                component:Annos
+            },
+
+            {
+                path:"/contact",
+                name:"Contact",
+                component:Contact
+            },
         ]
     },
 
@@ -51,6 +69,11 @@ const routes = [
         component:Admin,
         children:[
             {
+                path:"/",
+                name:"Admin",
+                component:AdminHome,
+            },
+            {
                 path:"addProduct",
                 name:"AddProduct",
                 component:AddProduct,
@@ -59,7 +82,17 @@ const routes = [
                 path:"addImage",
                 name:"AddImage",
                 component:AddImage
-            }
+            },
+            {
+                path:"addDealer",
+                name:"AddDealer",
+                component:AddDealer
+            },
+            {
+                path:"addAnnouncement",
+                name:"AddAnnouncemenet",
+                component:AddAnnouncement
+            },
         ]
 
     }

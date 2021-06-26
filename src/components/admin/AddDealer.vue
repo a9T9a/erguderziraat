@@ -2,11 +2,10 @@
     <div id="addImage">
         <div id="storedimgs">
             <input type="file" accept="image/*" @change="chooseImage($event)" ref="input" :style="{'display':'none'}">
-            <img class="img-container" src="../../assets/addImage.png" @click="$refs.input.click()">
-            <div :id="index" class="img-container" v-for="(item, index) in getImages" :key="index" @mouseover="show=index" @mouseleave="show=null">
+            <img id="addImg" class="img-container" src="../../assets/addImage.png" @click="$refs.input.click()">
+            <div :id="index" class="img-container" v-for="(item, index) in getDealers" :key="index" @mouseover="show=index" @mouseleave="show=null">
                 <img class="add" :src="item.imageURL">
                 <transition-group name="fade">
-                    <p v-if="show==index" :key="0" class="description">{{item.description}}</p>
                     <img v-if="show==index" :key="1" class="delete" src="../../assets/remove.png" @click="deleteImage(item.id,item.imageURL)">
                 </transition-group>
             </div>
@@ -19,9 +18,6 @@
                         <button @click="save(), $refs.cv.style.display='none'">Kaydet</button>
                         <button @click="$refs.cv.style.display='none'">Çıkış</button>
                     </div>
-                    <div class="info">
-                        <input type="text" class="form-control" placeholder="Resim açıklaması" v-model="item.description">
-                    </div>
                 </div>
                 <div class="bottom">
                     <vue-cropper
@@ -29,7 +25,7 @@
                         ref="cropper"
                         :guides="true"
                         :src="imageSrc"
-                        :aspectRatio="16/9"
+                        :aspectRatio="1/1"
                     ></vue-cropper>
                     <img v-if="this.croppedImageSrc" :src="croppedImageSrc" />
                 </div>
@@ -58,7 +54,6 @@ export default {
             file:null,
             item:{
                 image:null,
-                description:null
             },
             show:null,
             wait:false
@@ -66,13 +61,13 @@ export default {
     },
 
     created(){
-        eventBus.$on("SaveImageFinished",()=>{
+        eventBus.$on("SaveDealerFinished",()=>{
             this.wait=false
         })
     },
 
     computed:{
-        ...mapGetters(["getImages"])
+        ...mapGetters(["getDealers"])
     },
 
     methods:{
@@ -108,11 +103,11 @@ export default {
             let conf = confirm("Kaydedilsin mi?")
             if(conf){
                 this.wait=true
-                this.resizeImg(this.croppedImageSrc,800,450).then(result=>{
+                this.resizeImg(this.croppedImageSrc,200,200).then(result=>{
                     return this.dataURLtoFile(result,this.file.name)
                 }).then(img=>{
                     this.item.image=img
-                    this.$store.dispatch("saveimage",this.item)
+                    this.$store.dispatch("saveDealer",this.item)
                 }).catch(err=>{
                     console.log(err)
                 })
@@ -154,7 +149,7 @@ export default {
                 let findchar = str.indexOf("?")
                 let raw = str.slice((findchar-6), findchar)
                 let ext = raw.slice(raw.indexOf("."))
-                this.$store.dispatch("deleteImage",{id,ext})
+                this.$store.dispatch("deleteDealer",{id,ext})
             }
         }
     }
@@ -165,7 +160,7 @@ export default {
 
     .img-container{
         position: relative;
-        width: 22vmax;
+        width: 12.4vmax;
         height: 12.4vmax;
         object-fit:scale-down;
         float: left;
@@ -173,24 +168,12 @@ export default {
         box-shadow: 0vmax 0vmax 1.2vmax -0.1vmax rgba(100,100,100,0.7);
         cursor:pointer;
     }
+    #addImg{
+        width:18vmax
+    }
     .add{
         height: 100%;
         width: 100%;
-    }
-    .description{
-        position: absolute;
-        top: 60%;
-        width: 100%;
-        height: 30%;
-        background-color: rgba(100,100,100,0.4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        backdrop-filter: blur(20px);
-        font-size:1.2vmax;
-        font-weight: 700;
-        color: bisque;
-        border-radius: -1vmax 1vmax 0 0;
     }
     .delete{
         position: absolute;
@@ -346,9 +329,23 @@ export default {
 
 
     @media screen and (max-width: 768px) {
+        #storedimgs{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .img-container{
+            height: 30vmax;
+            width: 30vmax;
+            margin: 1vmax;
+        }
+        #addImg{
+            width:30vmax
+        }
         .top{
             margin-top: 1vh;
-            height: 10vh;
+            height: 5vh;
             flex-direction: column;
             padding-right: 2vmax;
         }

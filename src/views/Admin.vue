@@ -1,19 +1,42 @@
 <template>
   <div id="admin">
     <div id="nav">
+      <div class="navlink" @click="home">
+        <p>Ana Menü</p>
+      </div>
       <router-link tag="div" class="navlink" to="/admin/addProduct">
         <p>Ürün Ekleme</p>
       </router-link>
       <router-link tag="div" class="navlink" to="/admin/addImage">
         <p>Resim Ekleme</p>
       </router-link>
+      <router-link tag="div" class="navlink" to="/admin/addDealer">
+        <p>Bayilik Ekleme</p>
+      </router-link>
+      <router-link tag="div" class="navlink" to="/admin/addAnnouncement">
+        <p>Duyuru Ekleme</p>
+      </router-link>
     </div>
-    <router-view />
+    <router-view/>
   </div>
 </template>
 
 <script>
-export default {};
+import {mapGetters} from "vuex"
+export default {
+  
+  computed:{
+    ...mapGetters(["getFilters"])
+  },
+
+  methods:{
+    home(){
+      this.$router.push(
+        {path:"/admin"}
+      )
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -26,7 +49,7 @@ export default {};
 
 }
 #nav {
-  box-sizing: content-box;
+  box-sizing: border-box;
   display: flex;
   flex-direction: row;
   justify-content: left;
@@ -65,5 +88,22 @@ export default {};
   border-radius: 1vmax;
   height:80%;
   align-items: center;
+}
+
+.home{
+  height: 100%;
+  width: fit-content;
+  display: flex;
+}
+
+.home img{
+  height: 70%;
+  width: auto;
+}
+
+@media screen and (max-width:768px) {
+  .navlink p{
+    font-size: 1.5vmax;
+  }
 }
 </style>

@@ -2,29 +2,24 @@
     <div id="dealership">
         <div id="top"></div>
         <div class="container">
-            <img v-for="(item, index) in images" :key="index" :src="item" alt="aaa"/>
+            <img v-for="(item, index) in getDealers" :key="index" :src="item.imageURL" alt="aaa"/>
         </div>
     </div>
 </template>
 
 <script>
+import {mapGetters} from "vuex"
 export default {
     data(){
         return{
-            images:[
-                require("../assets/dealers/agrofernia.jpg"),
-                require("../assets/dealers/bayer.jpg"),
-                require("../assets/dealers/compoexpert.jpg"),
-                require("../assets/dealers/cosmocel.jpg"),
-                require("../assets/dealers/fmc.png"),
-                require("../assets/dealers/magnafert.jpg"),
-                require("../assets/dealers/syngenta.png"),
-            ]
+            images:[]
         }
     },
-    mounted() {
-        console.log(this.list)
+
+    computed:{
+        ...mapGetters(["getDealers"])
     },
+
 }
 </script>
 
@@ -66,9 +61,9 @@ export default {
         width: 200px;
         height: 200px;
         object-fit: cover;
-        margin: 1vmax;
+        margin: 2vmax;
         border-radius: 50%;
-        box-shadow: 0 0.5vmax 1vmax -.2vmax rgb(193, 193, 193);
+        box-shadow: 0 0.5vmax 1vmax -.2vmax rgb(100, 130, 100);
     }
 
     @media screen and (max-width:768px) {

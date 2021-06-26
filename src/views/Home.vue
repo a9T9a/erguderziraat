@@ -32,6 +32,18 @@
       </div>
     </div>
 
+    <div id="fourth">
+      <p class="info3">Sektörün Öncü Markaları ile Çalışmaktayız</p>
+      <router-link 
+       tag="button"
+       id="toproducts"
+       class="toabout"
+       to="/dealership">
+        Listele
+      </router-link>
+      <img class="fourth-bg" src="../assets/fourth-bg.jpg">
+    </div>
+
     <div id="bg">
       <div :style="{'position':'relative', 'width':'100%', 'height':'100%'}">
         <div class="filter"></div>
@@ -39,8 +51,9 @@
       </div>
     
     </div>
-
-    <detail-dialog :item="product" v-if="dialog" />
+    <transition name="fade">
+      <detail-dialog :item="product" v-if="dialog" />
+    </transition>
   </div>
 </template>
 
@@ -101,6 +114,8 @@ export default {
     flex-wrap: wrap;
     margin: 0;
     padding: 0;
+    height: 100%;
+    width: 100%;
   }
 
   #bg{
@@ -159,7 +174,7 @@ export default {
     height: fit-content;
     width: 60%;
     align-self: flex-end;
-    
+    margin-top: 2vmax;
   }
 
   #third{
@@ -203,6 +218,16 @@ export default {
     text-shadow: 0 0.1vmax .3vmax rgb(208, 207, 207);
   }
 
+  .info3{
+    font-weight: 700;
+    font-size: 4vmax;
+    color:rgba(17, 54, 20, 0.8);
+    align-self: flex-start;
+    margin-top: 1vmax;
+    margin-left: 2vmax;
+    text-shadow: 0 0.1vmax .3vmax rgb(208, 207, 207);
+  }
+
   #toproducts{
     box-sizing: border-box;
     background-color: rgba(226, 134, 69, 1);
@@ -221,6 +246,10 @@ export default {
   #toproducts:hover{
     box-shadow: 0 0 
   }
+
+  .toabout{
+    margin-top: 8vmax;
+  }
   
   hr{
     width: 50%;
@@ -235,6 +264,8 @@ export default {
     padding: 0;
     display: flex;
     flex-direction: row;
+    overflow: hidden;
+    flex-wrap: wrap;
   }
 
   .name{
@@ -262,6 +293,50 @@ export default {
     border-radius: 1vmax;
     box-shadow: 0 -0.3vmax 0.4vmax white, 0vmax 0.3vmax 0.4vmax rgb(189, 188, 188);
   }
+
+  #fourth{
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 60vh;
+    margin-bottom: 11vh;
+    overflow: hidden;
+  }
+  .fourth-bg{
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    object-position: top;
+    z-index: -1;
+    filter: brightness(85%);
+    animation: move2 linear 60s alternate infinite;
+  }
+
+  .fade-enter-active {
+      animation: moe .5s linear;
+  }
+  .fade-leave-active{
+      animation: moe .5s reverse;
+  }
+  .fade-enter, .fade-leave-to {
+      opacity: 0;
+      transform: scale(0);
+  }
+
+  @keyframes moe{
+      from{
+          transform: scale(0);
+      }
+      to{
+          transform:scale(1)
+      }
+  }
+
+
 
  @media screen and (max-width: 768px) {
     
@@ -341,10 +416,19 @@ export default {
     #toproducts{
       font-size: 2.5vmax;
     }
+    
+    .toabout{
+      margin-top: 3vmax;
+    }
 
     .pimg{
       height: 17vmax;
       width: 17vmax;
+    }
+
+    #fourth{
+      height: 35vh;
+      margin-bottom: 5vh;
     }
   }
 
@@ -355,6 +439,17 @@ export default {
 
     to{
       transform:scale(2)
+    }
+
+  }
+
+  @keyframes move2{
+    from{
+      transform:scale(1)
+    }
+
+    to{
+      transform:scale(1.5)
     }
 
   }

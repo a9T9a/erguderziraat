@@ -1,24 +1,40 @@
 <template>
     <div id="addProduct">
+
         <div id="form-container">
             <form id="form" @submit.prevent>
+
                 <div class="form-group">
                     <label class="text-left" for="category">İsim</label>
                     <input type="text" class="form-control" id="category" v-model="$v.product.name.$model">
                 </div>
+                
                 <div class="form-group">
-                    <label class="text-left" for="category">Kategori</label>
+                    <div class="itemhead">
+                        <label class="text-left" for="category">Kategori</label>
+                        <div class="headbtns">
+                            <p class="headinfo">Seçilen Kategoriyi :</p>
+                            <button class="headbtn" @click="deleteFilter('category')">Sil</button>
+                        </div>
+                    </div>
                     <select class="form-control" @change="onCatChange()" v-model="$v.product.category.$model">
                         <option value="" selected disabled>Kategori Seçin</option>
-                        <option v-for="(cat, index) in categories" :key="index" :value="cat.title">{{cat.title}}</option>
+                        <option v-for="(cat, index) in getFilters.categories" :key="index" :value="cat.title">{{cat.title}}</option>
                     </select>
                     <div class="input-group">
                         <input type="text" class="form-input" id="category" v-model="addN.category" placeholder="Yeni Kategori Ekle">
                         <button class="input-button" @click="addNew(1)">Ekle</button>
                     </div>
                 </div>
+                
                 <div class="form-group">
-                    <label class="text-left" for="subSategory">Alt Kategori</label>
+                    <div class="itemhead">
+                        <label class="text-left" for="category">Alt Kategori</label>
+                        <div class="headbtns">
+                            <p class="headinfo">Seçilen Alt Kategoriyi :</p>
+                            <button class="headbtn" @click="deleteFilter('subCategory')">Sil</button>
+                        </div>
+                    </div>
                     <select class="form-control" v-model="$v.product.subCategory.$model">
                         <option value="" selected disabled>Alt Kategori Seçin</option>
                         <option v-for="(subCat, index) in subCategories" :key="index" :value="subCat">{{subCat}}</option>
@@ -28,8 +44,15 @@
                         <button class="input-button" @click="addNew(2)">Ekle</button>
                     </div>
                 </div>
+                
                 <div class="form-group">
-                    <label class="text-left" for="brand">Marka</label>
+                    <div class="itemhead">
+                        <label class="text-left" for="category">Marka</label>
+                        <div class="headbtns">
+                            <p class="headinfo">Seçilen Markayı :</p>
+                            <button class="headbtn" @click="deleteFilter('brand')">Sil</button>
+                        </div>
+                    </div>
                     <select class="form-control" v-model="$v.product.brand.$model">
                         <option value="" selected disabled>Marka Seçin</option>
                         <option v-for="(brand, index) in brands" :key="index">{{brand}}</option>
@@ -39,58 +62,101 @@
                         <button class="input-button"  @click="addNew(3)">Ekle</button>
                     </div>
                 </div>
+                
                 <div class="form-group">
                     <label class="text-left" for="description">Açıklama</label>
-                    <textarea type="text" class="form-control" :style="{'height':'5vmax', 'line-height':'1vmax'}" id="description" v-model="$v.product.description.$model"></textarea>
+                    <textarea type="text" :onkeyup="autoGrow()" id="description" v-model="$v.des.$model"></textarea>
                 </div>
                 <div class="form-group">
                     <label class="text-left" for="description">Resim</label>
                     <input type="file" accept="image/*" ref="inputImage" class="form-control" @change="chooseImage($event)" :style="{'display':'none'}">
                     <button id="inputButton" @click="$refs.inputImage.click()">Ekle</button>
                 </div>
+                
                 <div>
                     <img v-if="product.image" :src="croppedImageSrc" class="productImage">
                 </div>
+                
                 <div class="button-group">
                     <button id="save" type="button" @click="save($event)" class="btn" :disabled="$v.$invalid">
                         Kaydet
                         <p class="warn" v-if="$v.$invalid">Boş alanları doldurun</p>
                     </button>
-                    <button type="reset" @click="reset" class="btn">Temizle</button>
+                    <button id="reset" type="reset" @click="reset" class="btn">Temizle - Yeni Ürün</button>
                 </div>
+
+                <p v-if="update" id="productid">Ürün :  {{updateid}}</p>
                 
             </form>
         </div>
+
+        <div id="list">
+            <h2 style="margin-bottom:2vmax;">Ürünler</h2>
+            <ul>
+                <li class="cat" v-for="(item,index) in getFilters.categories" :key="index">
+                    <p @click.self="openlist(item,index)">> {{item.title}}</p>
+                    <ul v-if="drop==index">
+                        <li class="listedbrands" v-for="(brand,ind) in dropbrands" :key="ind">
+                            <p @click.self="openbrand(brand,ind)">- {{brand}}</p>
+                            <ul v-if="drop2==ind">
+                                <li class="listedproduct" v-for="(product,idx) in droplist2" :key="idx" style="text-decoration:none;">
+                                    <div class="set">
+                                        <div class="edit">
+                                            <img src="../../assets/edit.png" @click="setProduct(product.id)" title="Düzenle">
+                                        </div>
+                                        <div class="delete">
+                                            <img src="../../assets/delete.png" @click="deleteProduct(product.id,product.imageURL)" title="Sil">
+                                        </div>
+                                    </div>
+                                    <div class="info">
+                                        <p><strong>{{product.name}}</strong></p>
+                                        <p style="align-self:center;">{{product.subCategory}}</p>
+                                    </div>
+                                    <img :src="product.imageURL">
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+        </div>
+
         <div id="cropperview" ref="cv">
             <div v-if="this.imageSrc" class="view">
-                <vue-cropper
-                    class="cropper"
-                    ref="cropper"
-                    :guides="true"
-                    :src="imageSrc"
-                    :aspectRatio="1/1"
-                    :outputSize="1"
-                    :fixedBox="true"
-                    :maxImgSize="800"
-                ></vue-cropper>
-                <div class="buttons">
-                    <button @click="cropImage">Kırp</button>
-                    <button @click="SetProductImage(), $refs.cv.style.display='none'">Kaydet</button>
-                    <button @click="$refs.cv.style.display='none'">Çıkış</button>
+                <div class="top">
+                    <div class="buttons">
+                        <button @click="cropImage">Kırp</button>
+                        <button @click="SetProductImage(), $refs.cv.style.display='none'">Kaydet</button>
+                        <button @click="$refs.cv.style.display='none'">Çıkış</button>
+                    </div>
                 </div>
-                <img v-if="croppedImageSrc" :src="croppedImageSrc" />
+                <div class="bottom">
+                    <vue-cropper
+                        class="cropper"
+                        ref="cropper"
+                        :guides="true"
+                        :src="imageSrc"
+                        :aspectRatio="1/1"
+                        :outputSize="1"
+                        :fixedBox="true"
+                        :maxImgSize="800"
+                    ></vue-cropper>
+                    <img v-if="croppedImageSrc" :src="croppedImageSrc" />
+                </div>
             </div>
         </div>
+
         <waiting v-if="wait"/>
+
     </div>
 </template>
 
 <script>
-//import Cropper from 'cropperjs'
 import { db } from "../../../firebase.js"
 import firebase from "firebase"
 import VueCropper from "vue-cropperjs"
-import 'cropperjs/dist/cropper.css';
+//import 'cropperjs/dist/cropper.css';
 import { eventBus } from "../../main"
 import { mapGetters } from "vuex"
 import { required } from    "vuelidate/lib/validators"
@@ -117,13 +183,13 @@ export default {
             brand:{
                 required
             },
-            description:{
-                required
-            },
             image:{
                 required
             }
-        }
+        },
+        des:{
+            required
+        },
     },
 
     data() {
@@ -136,7 +202,7 @@ export default {
                 category:null,
                 subCategory:null,
                 brand:null,
-                description:null,
+                description:[],
                 image:null,
             },
             addN:{
@@ -144,10 +210,19 @@ export default {
                 subCategory:null,
                 brand:null,
             },
+            des:null,
             categories:[],
             subCategories:[],
             brands:[],
             wait:false,
+            drop:null,
+            drop2:null,
+            droplist:[],
+            droplist2:[],
+            dropbrands:null,
+            update:false,
+            updateid:null,
+            updateimg:false,
         }
     },
 
@@ -156,7 +231,15 @@ export default {
             window.addEventListener("resize",()=>{
                 document.getElementById("cropperview").style.height=document.body.scrollHeight+"px"
             })
-        }
+        },
+
+        update(val){
+            if(val){
+                document.getElementById("save").innerHTML="Güncelle"
+            }else{
+                document.getElementById("save").innerHTML="Kaydet"
+            }
+        },
     },
 
     created(){
@@ -164,20 +247,34 @@ export default {
             document.getElementById("save").style.disabled=false
             this.wait=false
         })
-
-
+        eventBus.$on("UpdateProductFinished",()=>{
+            document.getElementById("save").style.disabled=false
+            this.wait=false
+            this.reset()
+            this.$router.go()
+        })
+        eventBus.$on("productDeleted",()=>{
+            this.drop2=null
+        })
     },
 
     mounted(){
-        this.categories=this.$store.getters.getFilters.categories
-        this.brands=this.$store.getters.getFilters.brands
         
-        /*sil*/
-        this.$store.dispatch("getFilters")
+        this.$store.commit("setCatFilter",null)
+        this.$store.commit("setSubFilter",null)
+
+        this.droplist=this.getProducts
+
+        this.$store.dispatch("getProducts")
+        setTimeout(() => {
+            this.$store.dispatch("getFilters")
+            this.categories=this.$store.getters.getFilters.categories
+            this.brands=this.$store.getters.getFilters.brands
+        }, 1500);
     },
 
     computed:{
-        ...mapGetters(["getFilters"]),
+        ...mapGetters(["getFilters","getProducts"]),
 
     },
 
@@ -220,14 +317,29 @@ export default {
             }).catch(err=>{
                 console.log(err)
             })
+            if(this.update){
+                this.updateimg=true
+            }else{
+                this.updateimg=false
+            }
             //this.product.image = this.dataURLtoFile(img,this.file.name)
         },
 
-        save(event){
-            let conf=confirm("Kaydedilsin mi?")
-            if(conf){
-                this.wait=true
-                this.$store.dispatch("saveProduct",this.product)
+        save(){
+            let lines = this.des.split("\n")
+            this.product.description=lines
+            if(this.update){
+                let conf=confirm("Ürün Güncellensin mi?")
+                if(conf){
+                    this.wait=true
+                    this.$store.dispatch("updateProduct",[this.product,this.updateid,this.updateimg])
+                }
+            }else{
+                let conf=confirm("Kaydedilsin mi?")
+                if(conf){
+                    this.wait=true
+                    this.$store.dispatch("saveProduct",this.product)
+                }
             }
         },
 
@@ -263,9 +375,10 @@ export default {
         },
 
         onCatChange(){
-            this.subCategories=this.categories.filter(e=>{
+            let list = this.categories.filter(e=>{
                 return e.title==this.product.category
-            })[0].sub
+            })
+            this.subCategories=list[0].sub
         },
 
         reset(){
@@ -277,6 +390,7 @@ export default {
                 description:null,
                 image:null,
             }
+            this.update=false
         },
 
         addNew(value){
@@ -290,7 +404,8 @@ export default {
                                 title:key,
                                 sub:[]
                             })
-                            this.categories.push(obj)
+                            this.$store.commit("addCategory",obj)
+                            this.categories.push(obj) //add to store filters
                             alert("Eklendi")
                         }).catch((error)=>{
                             alert("Bir hata oldu")
@@ -308,7 +423,8 @@ export default {
                             [key]: firebase.firestore.FieldValue.arrayUnion(val)
                             })
                         .then(()=>{
-                            this.subCategories.push(val)
+                            this.$store.commit("addSubCategory",{key,val})
+                            this.subCategories.push(val) //add to store filters
                             alert("Eklendi")
                         }).catch(()=>{
                             alert("Bir hata oldu")
@@ -335,6 +451,98 @@ export default {
                     break;
             }
         },
+
+        openlist(item,index){
+            if(index==this.drop){
+                this.drop=null
+            }else{
+                this.drop=index
+                this.drop2=null
+            }
+            let list = this.getProducts.filter(product=>product.category==item.title)
+            this.droplist = list
+            let brands = list.map(e=>e.brand)
+            this.dropbrands = [...new Set(brands)]
+        },
+
+        openbrand(brand,index){
+            if(index==this.drop2){
+                this.drop2=null
+            }else{
+                this.drop2=index
+            }
+            let list = this.droplist.filter(product=>product.brand==brand)
+            this.droplist2=list
+        },
+
+        async setProduct(id){
+            this.update=true
+            this.updateid=id
+            let p = this.$store.state.products.filter(product=>product.id==id)
+            this.product.name=p[0].name
+            this.product.category=p[0].category
+            await this.onCatChange()
+            this.product.subCategory=p[0].subCategory
+            this.product.brand=p[0].brand
+            this.des=p[0].description
+            this.product.name=p[0].name
+
+            this.croppedImageSrc=p[0].imageURL
+            this.product.image=p[0].imageURL
+        },
+
+        deleteProduct(id,url){
+            let conf=confirm("Ürünü Silmek İstediğinize Emin Misiniz?")
+            if(conf){
+                let str = String(url)
+                let findchar = str.indexOf("?")
+                let raw = str.slice((findchar-6), findchar)
+                let ext = raw.slice(raw.indexOf("."))
+                this.$store.dispatch("deleteProduct",{id,ext})
+            }
+        },
+
+        autoGrow(){
+            setTimeout(() => {
+                let des = document.getElementById("description")
+                if (des.scrollHeight > des.clientHeight) {
+                    des.style.height = des.scrollHeight + "px";
+                }
+            }, 500);
+
+        },
+
+        deleteFilter(item){
+            if(item=="category"){
+                let conf = confirm("Kategoriyi Silmek İstediğinize Emin Misiniz?")
+                if(conf){
+                    let cat = this.product.category
+                    this.$store.dispatch("deleteFilter",["category",cat])
+                }
+            }
+            else if(item=="subCategory"){
+                let conf = confirm("Alt Kategoriyi Silmek İstediğinize Emin Misiniz?")
+                if(conf){
+                    let cat = this.product.category
+                    let subCat = this.product.subCategory
+                    let index = this.subCategories.findIndex(i=>i==subCat)
+                    this.subCategories.splice(index,1)
+                    this.$store.dispatch("deleteFilter",["subCategory",cat,subCat])
+                }
+                
+            }
+            else if(item=="brand"){
+                let conf = confirm("Kategoriyi Silmek İstediğinize Emin Misiniz?")
+                if(conf){
+                    let brand = this.product.brand
+                    let index = this.brands.findIndex(b=>b==brand)
+                    this.brands.splice(index,1)
+                    this.$store.dispatch("deleteFilter",["brand",brand])
+                }
+
+            }
+
+        }
     },
 }
 </script>
@@ -347,7 +555,7 @@ export default {
         background: rgb(0, 180, 200);
     }
 
-    #app{
+    #addProduct{
         height: fit-content;
         display: flex;
         flex-direction: row;
@@ -370,6 +578,7 @@ export default {
     }
 
     #form{
+        position: relative;
         display: flex;
         flex-direction: column;
         width: 100%;
@@ -387,12 +596,46 @@ export default {
         background-color:rgb(245, 255, 255);
     }
 
+    .itemhead{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        height: fit-content;
+        box-sizing: border-box;
+        margin-right: 0.3vmax;
+    }
+
     .text-left{
         display: flex;
         justify-content: left;
         align-items: center;
         padding: 0.5vmax;
         font-size: 1.2vmax;
+    }
+
+    .headinfo{
+        font-size: .6vmax;
+        margin-right: .5vmax;
+        align-self: flex-end;
+    }
+
+    .headbtns{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+    .headbtn{
+        border: none;
+        background-color:rgba(180, 230, 240, 1);
+        border-radius: 0.5vmax;
+        border: 1px solid rgb(199, 199, 199);
+        cursor: pointer;
+    }
+
+    .headbtn:first-of-type{
+        margin-inline: .3vmax;
     }
 
     .form-control{
@@ -406,12 +649,28 @@ export default {
         line-height: 3vmax;
     }
 
+    #description{
+        font-family: Avenir, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        box-sizing: border-box;
+        outline: none;
+        border-radius: .5vmax;
+        border: 1px solid rgb(199, 199, 199);
+        height: 5vh;
+        margin: 0.3vmax;
+        padding-inline: 0.8vmax;
+        line-height: 3vmax;
+    }
+
     .btn{
         position: relative;
         margin:1vmax;
         margin-bottom: 3vmax;
         height: 2vmax;
-        width: 5vmax;
+        min-width: 5vmax;
+        width: fit-content;
+        padding-inline: 1vmax;
         border-radius: 0.5vmax;
         border: 1px solid rgb(199, 199, 199);
         background-color:rgba(180, 230, 240, 1);
@@ -433,7 +692,7 @@ export default {
         box-sizing: border-box;
         height: 2vmax;
         margin: 0.3vmax;
-        font-size: 1vmax;
+        font-size: .88vmax;
     }
 
     .form-input{
@@ -459,48 +718,91 @@ export default {
     }
 
     #cropperview{
+        box-sizing: border-box;
         display: none;
         position: absolute;
         flex-direction: row;
         justify-content: space-between;
-        align-items: flex-start;
         top: 0;
         left: 0;
-        height: 110%;
-        width: 99vw;
-        z-index: 2;
+        height: 100%;
+        width: 100%;
+        z-index: 1;
         backdrop-filter: blur(10px);
         transform-style: preserve-3d;
     }
     #cropperview::after{
         content: "";
         position: absolute;
-        background-color: rgba(100,100,100,0.7);
+        box-sizing: border-box;
+        background-color: rgba(100,100,100,0.9);
         width: 100%;
         height: 100%;
         top: 0;
         left: 0;
-        opacity: 0.9;
+    }
+    .view{
+        box-sizing: border-box;
+        display: flex;
+        flex-direction:column;
+        align-items: flex-start;
+        justify-content: top;
+        height: 90vh;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .top{
+        box-sizing: border-box;
+        width: 100%;
+        height: 5vh;
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 2vh;
+    }
+    .bottom{
+        box-sizing: border-box;
+        height: 100%;
+        width: 100%;
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 100%;
+        grid-gap: 1vmax;
+        align-items: center;
+        justify-items: center;
+        padding: .5vmax;
     }
     .cropper{
-        margin: 1vmax;
-        width: 40%;
-        height: auto;
-        z-index: 2;
-        box-shadow: -1vmax 1vmax 1vmax -0.5vmax rgb(70, 70, 70);
+        box-sizing: border;
+        width:auto;
+        max-width: 100%;
+        max-height: 100%;
+        z-index: 1;
+        box-shadow: 0 0 1vmax -.2vmax rgb(70, 70, 70);
+    }
+    #cropperview img{
+        box-sizing: border-box;
+        z-index: 2 ;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        box-shadow: 0 0 1vmax -.2vmax rgb(70, 70, 70);
+        align-self: center;
     }
     #cropperview .buttons{
+        box-sizing: border-box;
         z-index : 3;
         display : flex;
-        position: absolute;
         top: 0.5vmax;
         right: 0.5vmax;
         margin: 0.5vmax;
-        font-size: 1vmax;
+        height: 100%;
     }
     #cropperview .buttons button{
         cursor : pointer;
-        height: 2.5vmax;
+        height: 85%;
         width: 5vmax;
         border-radius:0.5vmax;
         border: none;
@@ -510,7 +812,6 @@ export default {
         box-shadow: 0 0 0.5vmax 0.1vmax rgb(105, 105, 105);
         font-weight: 600;
         text-align:center;
-        font-size: inherit;
     }
     /*#cropperview .buttons{
         z-index : 3;
@@ -534,22 +835,7 @@ export default {
         box-shadow: 0 0 0.5vmax 0.1vmax rgb(105, 135, 125);
 
     }
-    #cropperview img{
-        margin: 1vmax;
-        z-index: 2 ;
-        width: 30%;
-        height: auto;
-        box-shadow: -1vmax 1vmax 1vmax -0.5vmax rgb(70, 70, 70);
-    }
-    .view{
-        display: flex;
-        flex-direction:row;
-        align-items: flex-start;
-        padding-top: 5vmax;
-        justify-content: center;
-        height: fit-content;
-        width: 100%;
-    }
+    
 
     .productImage{
         float: left;
@@ -594,32 +880,167 @@ export default {
         font-size: 0.8vmax ;
     }
 
-    @media screen and (max-width: 700px) {
+    #list{
+        box-sizing: border-box;
+        min-height: 100vh;
+        height: fit-content;
+        width: 50%;
+        border: 1px solid rgb(180, 180, 180);
+        margin:1vmax;
+        border-radius: 0.5vmax;
+        box-shadow: 0 0 0.5vmax 0.1vmax rgb(180, 180, 180);
+        background-color:rgb(245, 255, 255);
+        padding: 1vmax;
+    }
+
+    .cat{
+        width: fit-content;
+        height: fit-content;
+        margin-block: 1.5vmax;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        font-size: 1.2vmax;
+    }
+    .cat p{
+        cursor:pointer;
+        margin: 0;
+        padding: 0;
+    }    
+    .listedproduct{
+        position: relative;
+        width: 17vmax;
+        height: 5vmax;
+        margin: 1vmax;
+        display: flex;
+        justify-content: space-between;
+        text-decoration-line: none;
+        border-radius: 1vmax;
+        box-shadow: -0.3vmax -0.3vmax 0.3vmax white, 0.3vmax 0.3vmax 0.4vmax rgb(188, 188, 188);
+        margin-left: 3vmax;
+        cursor:default;
+    }
+    .listedproduct img{
+        width: auto;
+        height: 100%;
+        border-radius: 0 1vmax 1vmax 0;
+    }
+    .set{
+        box-sizing: border-box;
+        position: absolute;
+        left:18vmax;
+        height: 5vmax;
+        width: 2.5vmax;
+        display: flex;
+        flex-direction: column;
+    }
+    .delete{
+        box-sizing: border-box;
+        padding: .6vmax;
+        height: 2.5vmax;
+        cursor:pointer;
+    }
+    .delete img{
+        height: 100%;
+        width:100%;
+        border-radius: 0;
+    }
+    .edit{
+        box-sizing: border-box;
+        padding: .6vmax;
+        height: 2.5vmax;
+        cursor: pointer;
+    }
+    .edit img{
+        height: 100%;
+        width:100%;
+        border-radius: 0;
+    }
+    .listedbrands{
+        width: 100%;
+        height: fit-content;
+        margin: 1vmax;
+        list-style-type: none;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        font-size: 1vmax;
+    }
+    .info{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: flex-start;
+        padding: .5vmax;
+        flex-wrap: wrap;
+        width:12vmax;
+    }
+    .info p{
+        font-size: .8vmax;
+        font-weight: 400;
+        margin: 0;
+        cursor: default;;
+    }
+
+
+    #productid{
+        position: absolute;
+        top: 0;
+        left: 65%;
+        color: red;
+        font-size: .7vmax;
+        width: fit-content;
+    }
+
+
+
+
+
+    @media screen and (max-width: 768px) {
         
-        #app{
+        #addProduct{
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
 
         .view{
-            margin-top: 4vmax;
-            flex-direction: column;
-            align-items: center;
-            justify-content: start;
+            height: 100%;
             max-height: 100%;
         }
 
-        #cropperview img{
-            width: 60%;
+        .top{
+            margin-top: 1vh;
+            height: 5vh;
+            flex-direction: column;
+            padding-right: 2vmax;
+        }
+        .bottom{
+            box-sizing: border-box;
+            align-self: center;
+            width: 100%;
+            height: 94vh;
+            grid-template-columns: 1fr;
+            grid-template-rows: 50% 50%;
+            padding-inline: 1vmax;
         }
         .cropper{
-            width: 60%;
+            width:auto;
+            max-width: 100%;
+            max-height: 100%;
+            justify-self: center;   
         }
-
+        #cropperview img{
+            max-width: 100%;
+            max-height: 95%;
+        }
+        #cropperview .buttons{
+            align-self: flex-end;
+        }
         #cropperview .buttons button{
-            height: 4vmax;
             width: 9vmax;
+            height: 100%;
             margin-right: 1vmax;
             font-size: 1.7vmax;
         }
@@ -629,8 +1050,20 @@ export default {
             margin-top:2vmax;
         }
 
+        .form-group{
+            margin-block: 2vmax;
+        }
+
         .text-left{
             font-size: 2vmax;
+        }
+
+        .headinfo{
+            font-size: 1vmax;
+        }
+
+        .headbtn{
+            font-size: 1.5vmax;
         }
 
         .form-control{
@@ -650,12 +1083,63 @@ export default {
         .btn{
             height: 4vmax;
             font-size: 1.7vmax;
-            width: 10vmax;
+            width: fit-content;
         }
 
         .warn{
             width: 15vmax;
             font-size: 1.2vmax;
+        }
+
+        #list{
+            width: 90%;
+        }
+
+        .cat p{
+            font-size:2vmax;
+            width: 100%;
+        }
+        .cat{
+            text-align: left;
+            width: 100%;
+        }
+        .listedbrands{
+            width: 100%;
+        }
+
+        ul{
+            box-sizing: border-box;
+            padding:0 ;
+            width: 100%;
+        }
+
+        .listedproduct{
+            width: 80%;
+            height: 8vh;
+        }
+
+        .set{
+            left: 100%;
+            height: 8vh;
+        }
+
+        .delete, .edit{
+            height: 4vh;
+            width: 4vh;
+        }
+
+        .delete img, .edit img{
+            height: 80%;
+            width: 80%;
+        }
+
+        .info p{
+            font-size: 1.5vmax;
+        }
+
+        #description{
+            box-sizing: border-box;
+            width: 100%;
         }
     }
 </style>

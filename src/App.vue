@@ -1,18 +1,23 @@
 <template>
   <div id="app">
+    <router-view></router-view>
     <transition name="fade">
-      <router-view></router-view>
     </transition>
   </div>
 </template>
 
 <script>
 export default {
+  metaInfo:{
+    title: "Ergüder Ziraat"
+  },
 
   created(){
     this.$store.dispatch("getImages")
     this.$store.dispatch("getProducts")
     this.$store.dispatch("getFilters")
+    this.$store.dispatch("getDealers")
+    this.$store.dispatch("getAnnos")
   },
 
 }
@@ -33,6 +38,24 @@ export default {
   /*background-color:rgb(240, 250, 240);*/
   background: none;
 }
+  ::-webkit-scrollbar {
+    width: 0.8vmax;
+    height: 0.5vmax;
+  }
+  ::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 .5vmax rgba(0,0,0,0.3);
+      box-shadow: inset 0 0 .5vmax rgba(0,0,0,0.3);
+      -webkit-border-radius: 6px;
+      border-radius: 6px;
+  }
+  ::-webkit-scrollbar-thumb {
+      -webkit-border-radius: 6px;
+      border-radius: 6px;
+      background: rgba(222, 225, 230, 0.5);
+  }
+  ::-webkit-scrollbar-thumb:window-inactive {
+      background: rgba(222, 225, 230, 0.5);
+  }
 
 @media screen and (min-width:768px) {
   

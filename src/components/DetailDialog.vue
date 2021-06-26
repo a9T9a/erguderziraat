@@ -9,7 +9,11 @@
                 <br>
                 <div class="subCategory">{{product.subCategory}}</div>
                 <br>
-                <div class="description">{{product.description}}</div>
+                <div class="description">
+                    <p v-for="(item,index) in product.description" :key="index">
+                        {{item}}
+                    </p>
+                </div>
             </div>
             <p id="remove" @click="exit">X</p>
         </div>
@@ -111,7 +115,6 @@ export default {
         width: 70%;
         background-color: white;
         border-radius: 0.5vmax;
-        border: 1px solid rgba(80, 80, 80, 1) ;
         box-shadow: 0vmax 1vmax 1vmax -0.1vmax rgba(80, 80, 80, 1);
     }
 
@@ -175,9 +178,9 @@ export default {
         }
 
         #view{
-            margin-top:4vmax;
             height: fit-content;
             flex-direction: column;
+            align-self: center;
         }
 
         img{

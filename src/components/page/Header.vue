@@ -55,7 +55,7 @@
             Ürünler
           </router-link>
 
-          <router-link 
+          <router-link
             tag="p"
             to="/about"
             class="nav-item"
@@ -74,21 +74,26 @@
           >
             Bayilikler
           </router-link>
+
+          <router-link 
+            tag="p"
+            to="/announcements"
+            class="nav-item"
+            @click.native="menuClose(), isActive=4"
+            exact-active-class="nav_item_active"
+          >
+            Duyurular
+          </router-link>
           
-          <p
+          <router-link
+            tag="p"
+            to="/contact"
             class="nav-item"
-            @click="isActive = 4"
-            :class="{ nav_item_active: isActive == 4 }"
+            @click.native="menuClose(), isActive=5"
+            exact-active-class="nav_item_active"
           >
-            Belgeler
-          </p>
-          <p
-            class="nav-item"
-            @click="isActive = 5"
-            :class="{ nav_item_active: isActive == 5 }"
-          >
-            Faydalı Bilgiler
-          </p>
+            İletişim
+          </router-link>
         </div>
       </div>
     </div>
@@ -100,30 +105,62 @@ export default {
   data(){
     return{
       isActive: null,
-      menu:true
+      menu:true,
+      blogo:false
     }
   },
 
-  /*watch:{
-    isActive:(value)=>{
-      if(value==1){
-        document.getElementById("top").classList.toggle("bgi")
-      }else if(value==0){
-        document.getElementById("top").classList.remove("bgi")
+  watch:{
+    '$route'(){
+      if(window.innerWidth<768 && this.$route.name=="Home"){
+        document.getElementById("logo").style.width="17vmax"
+        document.getElementById("logo").style.animation="scal linear .5s"
+        this.blogo=true
+        setTimeout(() => {
+          document.getElementById("logo").style.animation=null
+        }, 500);
+      }else if(window.innerWidth<768 && this.$route.name!="Home"){
+        document.getElementById("logo").style.width="12vmax"
+        if(this.blogo){
+          document.getElementById("logo").style.animation="scal linear .5s reverse"
+          this.blogo=false
+        }
+        setTimeout(() => {
+          document.getElementById("logo").style.animation=null
+        }, 500);
+      }else{
+        if(window.innerWidth<768){
+          document.getElementById("logo").style.width="12vmax"
+        }else{
+          document.getElementById("logo").style.width="7vmax"
+        }
       }
     }
-  },*/
+  },
 
   created(){
-
-    if(window.innerWidth<=768){
+  
+    if(window.innerWidth<768){
       this.menu=false
     }else{
       this.menu=true
     }
-
     window.addEventListener("resize",this.resize)
   },
+
+  mounted(){
+    if(window.innerWidth<768 && this.$route.name=="Home"){
+      document.getElementById("logo").style.width="17vmax"
+    }
+  },
+
+  /*mounted(){
+    if(window.innerWidth<768 && this.$route.name=="Home"){
+      document.getElementById("logo").style.width="16vmax"
+    }else{
+      document.getElementById("logo").style.width="12vmax"
+    }
+  },*/
 
   beforeDestroy(){
     window.removeEventListener("resize",this.resize)
@@ -134,8 +171,10 @@ export default {
     resize(){
       if(window.innerWidth<768){
         this.menu=false
+        document.getElementById("logo").style.width="12vmax"
       }else{
         this.menu=true
+        document.getElementById("logo").style.width="7vmax"
       }
     },
 
@@ -237,7 +276,7 @@ export default {
   margin-left: .5vmax;
   justify-content: center;
   align-items: center;
-  z-index: 1;
+  z-index: 2;
   cursor: pointer;
   padding-top: .5vmax;
 }
@@ -380,8 +419,6 @@ export default {
   transition: all 1s;
 }
 
-
-
 @media screen and (max-width: 768px){
   #top {
     height: 12vmax;
@@ -494,6 +531,15 @@ export default {
     height: 100%;
     width: 100%;
     opacity:1
+  }
+}
+
+@keyframes scal{
+  from{
+    width: 12vmax;
+  }
+  to{
+    width: 17vmax;
   }
 }
 </style>
